@@ -1,0 +1,293 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Marina — Agente de Reservas</title>
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;background:#f0f2f5;min-height:100vh;display:flex;align-items:center;justify-content:center;padding:20px}
+.shell{display:flex;width:1020px;height:700px;border-radius:16px;overflow:hidden;box-shadow:0 8px 40px rgba(0,0,0,.14);background:#fff}
+.sidebar{width:225px;min-width:225px;background:#f8f9fa;border-right:1px solid #e5e7eb;display:flex;flex-direction:column;padding:16px 12px;gap:5px}
+.logo{font-size:14px;font-weight:700;color:#111827;padding:4px 8px;margin-bottom:10px;display:flex;align-items:center;gap:8px}
+.nav-btn{display:flex;align-items:center;gap:8px;padding:8px 10px;border-radius:8px;border:none;background:transparent;color:#6b7280;font-size:13px;cursor:pointer;text-align:left;width:100%;transition:all .15s}
+.nav-btn:hover,.nav-btn.active{background:#fff;color:#111827;box-shadow:0 1px 3px rgba(0,0,0,.08)}
+.nav-btn.active{font-weight:600}
+.badge{margin-left:auto;background:#dbeafe;color:#1d4ed8;font-size:10px;padding:2px 7px;border-radius:20px;font-weight:700}
+.ql{font-size:11px;color:#9ca3af;padding:4px 8px;margin-top:8px;font-weight:600;text-transform:uppercase;letter-spacing:.04em}
+.qb{display:block;width:100%;text-align:left;background:#fff;border:1px solid #e5e7eb;color:#374151;font-size:12px;padding:6px 10px;border-radius:8px;cursor:pointer;margin-bottom:4px;transition:all .15s}
+.qb:hover{border-color:#93c5fd;background:#eff6ff;color:#1d4ed8}
+.chat-area{flex:1;display:flex;flex-direction:column;overflow:hidden}
+.chat-header{padding:14px 20px;border-bottom:1px solid #e5e7eb;display:flex;align-items:center;gap:12px;background:#fff}
+.avatar{width:38px;height:38px;border-radius:50%;background:#d1fae5;display:flex;align-items:center;justify-content:center;font-size:18px}
+.hi{flex:1}
+.hi h3{font-size:15px;font-weight:700;color:#111827}
+.hi p{font-size:12px;color:#10b981;display:flex;align-items:center;gap:4px;margin-top:1px}
+.sdot{width:7px;height:7px;border-radius:50%;background:#10b981;display:inline-block}
+.srv-badge{font-size:11px;padding:5px 11px;border-radius:6px;font-weight:600;border:none;cursor:default}
+.srv-ok{background:#d1fae5;color:#065f46}
+.srv-err{background:#fee2e2;color:#991b1b}
+.msgs{flex:1;overflow-y:auto;padding:20px;display:flex;flex-direction:column;gap:12px;background:#f9fafb}
+.msg{max-width:78%;display:flex;flex-direction:column;gap:3px}
+.msg.bot{align-self:flex-start}
+.msg.user{align-self:flex-end}
+.bubble{padding:11px 15px;border-radius:16px;font-size:14px;line-height:1.65}
+.msg.bot .bubble{background:#fff;color:#111827;border:1px solid #e5e7eb;border-bottom-left-radius:4px;box-shadow:0 1px 3px rgba(0,0,0,.06)}
+.msg.user .bubble{background:#2563eb;color:#fff;border-bottom-right-radius:4px}
+.mt{font-size:11px;color:#9ca3af;padding:0 4px}
+.msg.user .mt{text-align:right}
+.itag{font-size:10px;padding:2px 9px;border-radius:20px;margin-bottom:4px;display:inline-block;font-weight:700}
+.tr{background:#d1fae5;color:#065f46}
+.td{background:#dbeafe;color:#1e40af}
+.to{background:#fef3c7;color:#92400e}
+.tc{background:#fee2e2;color:#991b1b}
+.te{background:#f3f4f6;color:#4b5563;border:1px solid #d1d5db}
+.typing-wrap{background:#fff;border:1px solid #e5e7eb;border-radius:16px;border-bottom-left-radius:4px;padding:13px 16px;display:inline-flex;gap:5px;align-items:center;box-shadow:0 1px 3px rgba(0,0,0,.06)}
+.tdot{width:7px;height:7px;border-radius:50%;background:#9ca3af;animation:bl 1.2s infinite}
+.tdot:nth-child(2){animation-delay:.2s}.tdot:nth-child(3){animation-delay:.4s}
+@keyframes bl{0%,80%,100%{opacity:.2}40%{opacity:1}}
+.suggs{padding:8px 18px;display:flex;flex-wrap:wrap;gap:6px;background:#fff;border-top:1px solid #e5e7eb}
+.sb{background:#f3f4f6;border:1px solid #e5e7eb;color:#374151;font-size:12px;padding:5px 13px;border-radius:20px;cursor:pointer;transition:all .15s}
+.sb:hover{background:#eff6ff;border-color:#93c5fd;color:#1d4ed8}
+.inp-area{padding:12px 18px 14px;background:#fff;border-top:1px solid #e5e7eb}
+.msg-row{display:flex;gap:8px}
+.msg-row input{flex:1;padding:11px 15px;border:1px solid #d1d5db;border-radius:10px;font-size:14px;color:#111827;background:#fafafa}
+.msg-row input:focus{outline:none;border-color:#93c5fd;background:#fff;box-shadow:0 0 0 3px rgba(147,197,253,.25)}
+.msg-row input:disabled{opacity:.5;cursor:not-allowed}
+.sndbtn{background:#2563eb;border:none;color:#fff;padding:11px 18px;border-radius:10px;cursor:pointer;font-size:15px;transition:background .15s}
+.sndbtn:hover{background:#1d4ed8}
+.sndbtn:disabled{opacity:.5;cursor:not-allowed}
+.panel{flex:1;overflow-y:auto;padding:22px}
+.panel h2{font-size:17px;font-weight:700;color:#111827;margin-bottom:4px}
+.panel .sub{font-size:13px;color:#6b7280;margin-bottom:20px}
+.card{background:#f9fafb;border:1px solid #e5e7eb;border-radius:12px;padding:16px;margin-bottom:14px}
+.card h3{font-size:13px;font-weight:700;color:#374151;margin-bottom:10px}
+.irow{display:flex;justify-content:space-between;padding:5px 0;border-bottom:1px solid #e5e7eb;font-size:13px}
+.irow:last-child{border:none}
+.irow span:first-child{color:#6b7280}
+.irow span:last-child{color:#111827;font-weight:600}
+.step{display:flex;gap:10px;padding:9px 0;border-bottom:1px solid #e5e7eb}
+.step:last-child{border:none}
+.sn{width:26px;height:26px;border-radius:50%;background:#dbeafe;color:#1d4ed8;font-size:11px;font-weight:700;display:flex;align-items:center;justify-content:center;flex-shrink:0;margin-top:1px}
+.st{font-size:13px;color:#111827;font-weight:500}
+.ss{font-size:12px;color:#6b7280;margin-top:2px}
+.pill{display:inline-flex;font-size:11px;padding:3px 9px;border-radius:20px;margin:2px;font-weight:600}
+.pg{background:#d1fae5;color:#065f46}.pb{background:#dbeafe;color:#1e40af}.pa{background:#fef3c7;color:#92400e}
+.sg{margin-bottom:16px}
+.sg h4{font-size:11px;font-weight:700;color:#9ca3af;text-transform:uppercase;letter-spacing:.05em;margin-bottom:8px}
+.cbt{display:block;width:100%;text-align:left;background:#f9fafb;border:1px solid #e5e7eb;border-radius:8px;padding:9px 12px;font-size:13px;color:#374151;cursor:pointer;margin-bottom:5px;transition:all .15s}
+.cbt:hover{border-color:#93c5fd;background:#eff6ff}
+.stag{font-size:10px;padding:1px 8px;border-radius:20px;margin-right:7px;font-weight:700}
+</style>
+</head>
+<body>
+<div class="shell">
+  <div class="sidebar">
+    <div class="logo">🏖️ Agente Marina</div>
+    <button class="nav-btn active" onclick="showTab('chat')" id="nav-chat">💬 Chat ao vivo <span class="badge" id="msg-count">0</span></button>
+    <button class="nav-btn" onclick="showTab('cenarios')" id="nav-cenarios">📋 100 cenários</button>
+    <button class="nav-btn" onclick="showTab('pousadas')" id="nav-pousadas">🏨 Pousadas</button>
+    <button class="nav-btn" onclick="showTab('fluxo')" id="nav-fluxo">🔀 Fluxo de venda</button>
+    <button class="nav-btn" onclick="showTab('politicas')" id="nav-politicas">📄 Políticas</button>
+    <div class="ql">Perfis de teste</div>
+    <button class="qb" onclick="sendQ('Oi, quero reservar para mim e minha esposa em julho')">👫 Casal</button>
+    <button class="qb" onclick="sendQ('Somos 2 adultos e 2 crianças de 5 e 8 anos')">👨‍👩‍👧‍👦 Família</button>
+    <button class="qb" onclick="sendQ('Somos um grupo de 8 amigos')">🎉 Grupo</button>
+    <button class="qb" onclick="sendQ('Vou a trabalho por 5 dias')">💼 Trabalho</button>
+    <button class="qb" onclick="sendQ('Achei um pouco caro, tem desconto?')">💬 Objeção</button>
+    <button class="qb" onclick="sendQ('Preciso cancelar minha reserva')">❌ Cancelamento</button>
+    <button class="qb" onclick="resetChat()" style="color:#ef4444;border-color:#fca5a5;margin-top:4px">🔄 Reiniciar</button>
+  </div>
+
+  <div id="tab-chat" class="chat-area">
+    <div class="chat-header">
+      <div class="avatar">👩‍💼</div>
+      <div class="hi"><h3>Marina — Consultora de Reservas</h3><p><span class="sdot"></span>Online agora</p></div>
+      <span id="srv-badge" class="srv-badge srv-err">⚠ Verificando servidor...</span>
+    </div>
+    <div class="msgs" id="messages"></div>
+    <div class="suggs" id="suggestions"></div>
+    <div class="inp-area">
+      <div class="msg-row">
+        <input type="text" id="userinput" placeholder="Digite sua mensagem..." disabled onkeydown="if(event.key==='Enter')sendMsg()">
+        <button class="sndbtn" id="sndbtn" onclick="sendMsg()" disabled>➤</button>
+      </div>
+    </div>
+  </div>
+
+  <div id="tab-cenarios" class="panel" style="display:none">
+    <h2>100 cenários de treinamento</h2>
+    <p class="sub">Clique para testar no chat</p>
+    <div id="cenarios-lista"></div>
+  </div>
+
+  <div id="tab-pousadas" class="panel" style="display:none">
+    <h2>Pousadas cadastradas</h2><p class="sub">Base de conhecimento do agente</p>
+    <div class="card"><h3>🌅 Terra do Sol</h3>
+      <div class="irow"><span>Endereço</span><span>Av. Eng. Roberto Freire, 5455</span></div>
+      <div class="irow"><span>Localização</span><span>Beira-mar, vista mar selecionada</span></div>
+      <div class="irow"><span>Check-in / out</span><span>Após 13h / Até 11h</span></div>
+      <div class="irow"><span>Café da manhã</span><span>07h às 09h30</span></div>
+      <div class="irow"><span>Piscina</span><span>Não possui</span></div>
+      <div class="irow"><span>Estacionamento</span><span>Gratuito / Garagem R$20/diária</span></div>
+      <div style="margin:10px 0 6px;font-size:12px;font-weight:700;color:#6b7280">Quartos</div>
+      <div style="font-size:12px;color:#374151;line-height:2">6× Duplo Standard | 2× Duplo Vista Mar | 1× Duplo Varanda Vista Mar<br>2× Triplo Standard | 2× Triplo Varanda Vista Mar | 1× Quádruplo Standard</div>
+    </div>
+    <div class="card"><h3>🌴 Recanto de Ponta Negra</h3>
+      <div class="irow"><span>Endereço</span><span>Av. Eng. Roberto Freire, 5023</span></div>
+      <div class="irow"><span>Localização</span><span>~80m da praia, ambiente tranquilo</span></div>
+      <div class="irow"><span>Check-in / out</span><span>Após 13h / Até 11h</span></div>
+      <div class="irow"><span>Café da manhã</span><span>07h às 09h30</span></div>
+      <div class="irow"><span>Piscina</span><span>Das 10h às 22h</span></div>
+      <div class="irow"><span>Estacionamento</span><span>Gratuito (sujeito à disponibilidade)</span></div>
+      <div style="margin:10px 0 6px;font-size:12px;font-weight:700;color:#6b7280">Quartos</div>
+      <div style="font-size:12px;color:#374151;line-height:2">4× Duplo Standard | 1× Duplo Twin | 1× Duplo Vista Piscina<br>3× Triplo Standard | 2× Triplo Varanda Vista Piscina | 1× Triplo Vista Piscina</div>
+    </div>
+  </div>
+
+  <div id="tab-fluxo" class="panel" style="display:none">
+    <h2>Fluxo de venda</h2><p class="sub">Lógica do agente</p>
+    <div class="card"><h3>🎯 Intenções</h3>
+      <div class="step"><div class="sn">R</div><div><div class="st">Reserva</div><div class="ss">Coletar dados, qualificar, oferecer opções</div></div></div>
+      <div class="step"><div class="sn">D</div><div><div class="st">Dúvida</div><div class="ss">Responder e redirecionar para reserva</div></div></div>
+      <div class="step"><div class="sn">C</div><div><div class="st">Cancelamento</div><div class="ss">Empatia → retenção → política 15 dias</div></div></div>
+      <div class="step"><div class="sn">A</div><div><div class="st">Alteração</div><div class="ss">Verificar disponibilidade e facilitar</div></div></div>
+      <div class="step"><div class="sn">S</div><div><div class="st">Solicitação especial</div><div class="ss">Acolher, confirmar, usar como diferencial</div></div></div>
+    </div>
+    <div class="card"><h3>👥 Perfis</h3>
+      <div class="step"><div class="sn">👫</div><div><div class="st">Casal → Terra do Sol, Vista Mar</div></div></div>
+      <div class="step"><div class="sn">👨‍👩‍👧</div><div><div class="st">Família → Recanto, piscina, quarto maior</div></div></div>
+      <div class="step"><div class="sn">🎉</div><div><div class="st">Grupo → triplos, quartos próximos</div></div></div>
+      <div class="step"><div class="sn">💼</div><div><div class="st">Trabalho → Wi-fi, conforto, localização</div></div></div>
+      <div class="step"><div class="sn">🎊</div><div><div class="st">Evento → melhor categoria, personalização</div></div></div>
+    </div>
+  </div>
+
+  <div id="tab-politicas" class="panel" style="display:none">
+    <h2>Políticas</h2><p class="sub">Regras que o agente comunica</p>
+    <div class="card"><h3>💳 Pagamento</h3>
+      <div class="irow"><span>Confirmação</span><span>50% via PIX</span></div>
+      <div class="irow"><span>Saldo no check-in</span><span>PIX / Dinheiro / Débito / Crédito</span></div>
+      <div class="irow"><span>Sem juros</span><span>Até 3× acima de R$600</span></div>
+      <div class="irow"><span>Com juros</span><span>Até 12× qualquer valor</span></div>
+    </div>
+    <div class="card"><h3>📅 Cancelamento</h3>
+      <div class="irow"><span>Prazo sem multa</span><span>Até 15 dias antes do check-in</span></div>
+    </div>
+  </div>
+</div>
+
+<script>
+const BASE = 'RAILWAY_URL_AQUI';
+const C={reserva:{cl:'tr',lb:'Reserva'},duvida:{cl:'td',lb:'Dúvida'},cancel:{cl:'tc',lb:'Cancelamento'},objection:{cl:'to',lb:'Objeção'},especial:{cl:'te',lb:'Especial'}};
+const SM={cancel:['Posso reagendar?','Prazo sem multa?','Como funciona reembolso?'],objection:['Pode parcelar?','Qual o diferencial?','Tem promoção?'],reserva:['Diferença entre pousadas?','Como confirmo?','Formas de pagamento?'],especial:['Check-in antecipado?','Quarto com vista?','Quartos disponíveis?'],duvida:['Quero fazer uma reserva','Tem piscina?','Qual a localização?']};
+const CENS=[
+  {g:"Intenção — Reserva",t:"reserva",i:["Quero fazer uma reserva para o mês que vem","Vocês têm quarto para o carnaval?","Quanto custa uma semana em julho?","Quero reservar para mim e minha esposa","Preciso de quarto para o réveillon","Tem disponibilidade para novembro?","Quero passar o ano novo em Natal","Quartos para 4 pessoas?","Semana completa em agosto","Como faço para reservar?"]},
+  {g:"Intenção — Dúvida",t:"duvida",i:["A pousada fica perto da praia?","Tem café da manhã incluso?","Qual o horário do check-in?","Aceita animais de estimação?","Tem estacionamento?","A piscina é aquecida?","Distância até o centro de Natal?","Tem ar condicionado?","O café da manhã é bom?","Tem Wi-Fi nos quartos?"]},
+  {g:"Intenção — Cancelamento",t:"cancel",i:["Preciso cancelar minha reserva","Tive um imprevisto","Posso cancelar sem multa?","O voo foi cancelado","Quero cancelar e reagendar","Cancela a reserva do dia 15","Emergência familiar","Posso cancelar com 20 dias de antecedência?","Como funciona o reembolso?","Não vou conseguir ir"]},
+  {g:"Intenção — Alteração",t:"especial",i:["Quero mudar a data da reserva","Posso antecipar o check-in?","Preciso trocar o tipo de quarto","Somos mais uma pessoa","Posso fazer check-out depois das 11h?","Quero mudar para quarto com vista mar","Preciso adiar uma semana","Posso trocar de pousada?","Mudou o número de pessoas","Late check-out é possível?"]},
+  {g:"Solicitação especial",t:"especial",i:["É aniversário da minha esposa, tem decoração?","Posso pedir chegada antecipada?","Quartos lado a lado?","Somos lua de mel","Meu filho tem alergia","Preciso de quarto no térreo","Precisamos de berço para bebê","Garantir quarto com vista mar?","Viagem a trabalho, nota fiscal?","Posso levar instrumento musical?"]},
+  {g:"Perfil — Casal",t:"reserva",i:["Vou com minha namorada comemorar 1 ano","Escapada romântica para Natal","Somos recém-casados","Minha esposa adora mar","Quero surpreender minha parceira","Aniversário de casamento","Lua de mel em Natal","Casal sem filhos, tranquilidade e mar","Namorada nunca viu o mar","Apaixonados por pôr do sol"]},
+  {g:"Perfil — Família",t:"reserva",i:["2 adultos e 2 crianças de 5 e 8 anos","Filha de 3 anos pode usar a piscina?","Quarto para família com 3 filhos?","Os filhos pagam hospedagem?","Quarto grande para toda a família","Viajamos com bebê de 1 ano","Filho de 10 anos precisa de cama extra?","Família com avós","Crianças adoram piscina","5 pessoas, 3 adultos e 2 crianças"]},
+  {g:"Perfil — Grupo",t:"reserva",i:["10 amigos querendo ir para Natal","Reservar vários quartos ao mesmo tempo?","Turma de 6 pessoas","Grupo tem desconto?","Como funciona reserva em grupo?","Aniversário surpresa com 8 amigos","4 casais juntos","Grupo misto, alguns querem vista mar","Turma de faculdade, 12 pessoas","Grupo corporativo, 7 colaboradores"]},
+  {g:"Perfil — Trabalho",t:"duvida",i:["Vou a Natal a trabalho por 5 dias","Preciso de Wi-Fi bom para home office","Wi-Fi suporta videochamada?","Viagem corporativa, nota fiscal?","Tem mesa de trabalho nos quartos?"]},
+  {g:"Objeções",t:"objection",i:["Está um pouco caro","Vou pesquisar mais antes de decidir","Preciso falar com meu marido","Ainda não sei se vou conseguir ir","Achei mais barato em outro lugar","Vou pensar e te falo depois","Preciso confirmar as férias","Só reservo se tiver certeza","Está fora do meu orçamento","Tem alguma promoção?"]}
+];
+
+let history=[],msgCount=0,busy=false,srvOk=false;
+
+async function checkServer(){
+  try{
+    const r=await fetch(BASE+'/',{method:'GET',signal:AbortSignal.timeout(5000)});
+    if(r.ok){
+      srvOk=true;
+      document.getElementById('srv-badge').textContent='✅ Servidor conectado';
+      document.getElementById('srv-badge').className='srv-badge srv-ok';
+      document.getElementById('userinput').disabled=false;
+      document.getElementById('sndbtn').disabled=false;
+    }
+  }catch{
+    srvOk=false;
+    document.getElementById('srv-badge').textContent='❌ Servidor offline';
+    document.getElementById('srv-badge').className='srv-badge srv-err';
+  }
+}
+
+function gT(){return new Date().toLocaleTimeString('pt-BR',{hour:'2-digit',minute:'2-digit'})}
+function dI(t){
+  const s=t.toLowerCase();
+  if(/cancelar|reembolso|desistir/.test(s))return'cancel';
+  if(/caro|desconto|pesquisar|pensar|parceiro|marido|decidir/.test(s))return'objection';
+  if(/reservar|reserva|disponib|quarto|hospedagem|quanto custa/.test(s))return'reserva';
+  if(/mudar|alterar|trocar|adiar|antecipar/.test(s))return'especial';
+  return'duvida';
+}
+function addMsg(role,text,intent){
+  const m=document.getElementById('messages');
+  const d=document.createElement('div');d.className='msg '+(role==='user'?'user':'bot');
+  let tag='';
+  if(role==='user'&&intent){const c=C[intent]||C.duvida;tag=`<span class="itag ${c.cl}">${c.lb}</span>`;}
+  d.innerHTML=`${tag}<div class="bubble">${text.replace(/\n/g,'<br>')}</div><div class="mt">${gT()}</div>`;
+  m.appendChild(d);m.scrollTop=m.scrollHeight;
+  if(role==='user'){msgCount++;document.getElementById('msg-count').textContent=msgCount;}
+}
+function showTyping(){
+  const m=document.getElementById('messages');
+  const d=document.createElement('div');d.id='typ';d.className='msg bot';
+  d.innerHTML='<div class="typing-wrap"><div class="tdot"></div><div class="tdot"></div><div class="tdot"></div></div>';
+  m.appendChild(d);m.scrollTop=m.scrollHeight;
+}
+function hideTyping(){const t=document.getElementById('typ');if(t)t.remove();}
+function setUI(off){document.getElementById('userinput').disabled=off||!srvOk;document.getElementById('sndbtn').disabled=off||!srvOk;busy=off;}
+function setSugg(intent){
+  const s=document.getElementById('suggestions');s.innerHTML='';
+  (SM[intent]||SM.duvida).forEach(txt=>{
+    const b=document.createElement('button');b.className='sb';b.textContent=txt;
+    b.onclick=()=>{if(!busy)sendQ(txt)};s.appendChild(b);
+  });
+}
+async function callMarina(msg){
+  if(busy||!srvOk)return;
+  const intent=dI(msg);
+  history.push({role:'user',content:msg});
+  addMsg('user',msg,intent);showTyping();setUI(true);
+  try{
+    const res=await fetch(BASE+'/chat',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({messages:history,max_tokens:600})});
+    if(!res.ok)throw new Error('HTTP '+res.status);
+    const data=await res.json();
+    const reply=(data.content||[]).map(b=>b.text||'').join('').trim()||'Desculpe, pode repetir?';
+    hideTyping();history.push({role:'assistant',content:reply});addMsg('bot',reply);setSugg(intent);
+  }catch(e){
+    hideTyping();addMsg('bot','Erro de conexão. Verifique se o servidor está no ar.');history.pop();
+  }finally{setUI(false);}
+}
+async function sendMsg(){const inp=document.getElementById('userinput');const txt=inp.value.trim();if(!txt||busy)return;inp.value='';await callMarina(txt);}
+async function sendQ(txt){if(!busy)await callMarina(txt);}
+function resetChat(){if(busy)return;history=[];msgCount=0;document.getElementById('messages').innerHTML='';document.getElementById('msg-count').textContent='0';setSugg('duvida');startConvo();}
+function showTab(tab){
+  ['chat','cenarios','pousadas','fluxo','politicas'].forEach(t=>{
+    document.getElementById('tab-'+t).style.display=t===tab?(t==='chat'?'flex':'block'):'none';
+    const n=document.getElementById('nav-'+t);if(n)n.classList.toggle('active',t===tab);
+  });
+}
+function buildCens(){
+  const el=document.getElementById('cenarios-lista');
+  CENS.forEach(g=>{
+    const div=document.createElement('div');div.className='sg';div.innerHTML=`<h4>${g.g}</h4>`;
+    g.i.forEach(txt=>{
+      const btn=document.createElement('button');btn.className='cbt';
+      const c=C[g.t]||C.duvida;btn.innerHTML=`<span class="stag ${c.cl}">${c.lb}</span>${txt}`;
+      btn.onclick=()=>{showTab('chat');setTimeout(()=>sendQ(txt),100)};div.appendChild(btn);
+    });
+    el.appendChild(div);
+  });
+}
+function startConvo(){
+  const txt=`Olá! Bem-vindo às Pousadas Terra do Sol e Recanto de Ponta Negra 🌊\n\nSou a Marina, consultora de reservas. Como posso ajudar você hoje?`;
+  addMsg('bot',txt);history.push({role:'assistant',content:txt});setSugg('duvida');
+}
+checkServer();buildCens();startConvo();
+setInterval(checkServer,10000);
+</script>
+</body>
+</html>
