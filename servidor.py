@@ -92,7 +92,7 @@ class Handler(BaseHTTPRequestHandler):
         length = int(self.headers.get("Content-Length", 0))
         body = self.rfile.read(length)
 
-        if self.path == "/chat":
+        if self.path == "/chat" or self.path.startswith("/chat"):
             if not API_KEY:
                 self.send_response(401)
                 self.send_header("Content-Type", "application/json")
